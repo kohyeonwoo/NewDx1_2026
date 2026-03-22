@@ -75,7 +75,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_NEWDX1));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+3);
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_NEWDX1);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -126,6 +126,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+
+WORD a;
+
+//HWND --> Window Handle
+//message -> 메시지
+//wParam -> 메시지에 대한 추가 정보(키보드 입력정보, 마우스 입력정보 등)
+//lParam -> 메시지에 대한 추가 정보(마우스 위치)
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -149,12 +157,67 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
+
+        //여기서 그려낸다
+
             PAINTSTRUCT ps;
+
+            //H--> Handle
+
+            //DC--> Device Context
+
+            //HDC --> 출력을 하는 부분에도 모두 관여한다
+
             HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+           
+            const  WCHAR* text = L"Hello World!!";
+
+            //LPCWSTR--> Long Pointer to Constant Wide String            
+            TextOut(hdc, 0, 0, text , 13);
+
+            //점으로 표현 
+            for (int i = 0; i < 100; i++)
+            {
+                for (int j = 0; j < 100; j++)
+                {
+
+                    SetPixel(hdc, 100 + i, 100 + j, RGB(255, 255, 0));
+                    //화면에 있는 해당 위치에 있는 픽셀에 색을 채워준다
+
+                }
+            }
+
+            //선으로 표현 
+            MoveToEx(hdc, 0, 100, nullptr); //시작 점 
+
+            LineTo(hdc, 100, 200);//끝점
+            //
+
+            //다각형으로 표현 
+            Rectangle(hdc, 100, 0, 200, 100);
+            
+            //Ellipse
+            Ellipse(hdc, 200, 0, 300, 100);
+
             EndPaint(hWnd, &ps);
         }
         break;
+    case WM_LBUTTONDOWN:
+    {
+        //마우스 왼쪽 버튼 클릭할 경우
+        //POINT pt;
+        //GetCursorPos(&pt); //마우스 좌표를 가져온다
+        //ScreenToClient(hWnd, &pt);//클라이언트 좌표로 변환
+        //WCHAR text[100];
+        //wsprintf(text, L"Mouse Clicked at (%d, %d)", pt.x, pt.y); //클릭한 좌표 부분 출력 
+        //MessageBox(hWnd, text, L"Mouse Click", MB_OK);
+     
+        int mouseX = LOWORD(lParam);
+        int mouseY = LOWORD(lParam);
+
+    }
+    break;
+       
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
