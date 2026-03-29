@@ -1,7 +1,7 @@
 ﻿// NewDx1.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
-#include "framework.h"
+#include "Framework.h"
 #include "NewDx1.h"
 
 #define MAX_LOADSTRING 100
@@ -127,17 +127,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-WORD a;
-
 //HWND --> Window Handle
 //message -> 메시지
 //wParam -> 메시지에 대한 추가 정보(키보드 입력정보, 마우스 입력정보 등)
 //lParam -> 메시지에 대한 추가 정보(마우스 위치)
 
+PaintTool * paintTool = nullptr;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_CREATE:
+    {
+        paintTool = new PaintTool(hWnd);
+    }
+    break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -212,13 +217,47 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         //wsprintf(text, L"Mouse Clicked at (%d, %d)", pt.x, pt.y); //클릭한 좌표 부분 출력 
         //MessageBox(hWnd, text, L"Mouse Click", MB_OK);
      
-        int mouseX = LOWORD(lParam);
-        int mouseY = LOWORD(lParam);
+      /*  prevMousePos.x = LOWORD(lParam);
+        prevMousePos.y = HIWORD(lParam);
+        isMouseDown = true;*/
+
+        paintTool->OnLButtonDown(lParam);
 
     }
     break;
+
+    case WM_MOUSEMOVE:
+    {
+
+       /* if (isMouseDown)
+        {
+            POINT curMousePos;
+            curMousePos.x = LOWORD(lParam);
+            curMousePos.y = HIWORD(lParam);
+
+            HDC hdc = GetDC(hWnd);
+
+            MoveToEx(hdc, prevMousePos.x, prevMousePos.y, nullptr);
+            LineTo(hdc, curMousePos.x, curMousePos.y);
+            ReleaseDC(hWnd, hdc);
+            prevMousePos = curMousePos;
+
+        }*/
+
+        paintTool->OnMouseMove(lParam);
        
+    }
+        break;
+
+    case WM_LBUTTONUP :
+    {
+       // isMouseDown = false;
+        paintTool->OnLButtonUp(lParam);
+    }
+        break;
+
     case WM_DESTROY:
+        delete paintTool;
         PostQuitMessage(0);
         break;
     default:
